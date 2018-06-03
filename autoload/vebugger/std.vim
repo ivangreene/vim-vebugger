@@ -341,6 +341,7 @@ function! vebugger#std#updateMarksForFile(state,filename)
         if !empty(a:state)
             if !empty(a:state.std.location)
                 if fnamemodify(a:state.std.location.file,':p')==fnamemodify(a:filename,':p')
+                    exe 'normal \<Esc>'
                     exe 'sign place 1 name=vebugger_current line='.a:state.std.location.line.' file='.fnameescape(fnamemodify(l:filename,':p'))
                 endif
             endif
