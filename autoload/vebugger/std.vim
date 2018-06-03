@@ -199,12 +199,18 @@ function! s:standardThinkHandlers.moveToCurrentLine(readResult,debugger) dict
         endif
         if a:debugger.state.std.location!=a:readResult.std.location
             if has_key(a:debugger.state.std.location,'file')
+              if filereadable(fnamemodify(a:debugger.state.std.location.file,':p'))
                 exe 'sign unplace 1 file='.fnameescape(fnamemodify(a:debugger.state.std.location.file,':p'))
+              endif
             endif
             let a:debugger.state.std.location=deepcopy(a:readResult.std.location)
-            exe get(g:, 'vebugger_view_source_cmd', 'tab drop').' '.(a:readResult.std.location.file)
-            call vebugger#std#updateMarksForFile(a:debugger.state,a:readResult.std.location.file)
-            exe 'sign jump 1 file='.fnameescape(fnamemodify(a:readResult.std.location.file,':p'))
+            if filereadable(fnamemodify(a:readResult.std.location.file,':p'))
+              exe get(g:, 'vebugger_view_source_cmd', 'tab drop').' '.fnamemodify(a:readResult.std.location.file,':p')
+              call vebugger#std#updateMarksForFile(a:debugger.state,fnamemodify(a:readResult.std.location.file,':p'))
+              exe 'sign jump 1 file='.fnameescape(fnamemodify(a:readResult.std.location.file,':p'))
+            else
+              VBGstepOut
+            endif
         endif
     endif
 endfunction
